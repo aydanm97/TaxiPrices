@@ -1,0 +1,113 @@
+﻿@page "/"
+@using TaxiPrices.Models
+@inject IJSRuntime js
+
+
+<PageTitle>Prisberegner til 4x27</PageTitle>
+
+<div class="container">
+    <div class="row justify-content-between">
+        <div class="col-md-6">
+            <div class="container">
+                <div class="row justify-content-start">
+                    <div class="col-md-12">
+                        <div class="card justify-content-start mt-5" style="width:25rem;">
+                            <div class="card-header">
+                                Prisberegner til 4x27
+                            </div>
+
+                            <div class="card-body">
+                                <EditForm Model="@model" OnValidSubmit="HandleValidSubmit" id="taxiForm">
+                                    <DataAnnotationsValidator></DataAnnotationsValidator>
+
+                                    <div class="form-group">
+                                        <label>Antal km der skal køres:</label>
+                                        <InputNumber @bind-Value="model.km" id="km" class="form-control" />
+                                        <ValidationMessage For="(() => model.km)"></ValidationMessage>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Antal minutter til destinationen:</label>
+                                        <input type="number" id="minutes" @bind="model.minutes" class="form-control" />
+                                        <ValidationMessage For="(() => model.minutes)"></ValidationMessage>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="form-group">
+                                            <div class="form-group">
+                                                <label>Vogntype:</label>
+                                                <select @bind="selectedVogn" id="vogn" class="form-control">
+                                                    <option value="">--Select a VognType--</option>
+                                                    @foreach (var vogn in vognChoice)
+                                                    {
+                                                        <option value="@vogn.Id">@vogn.VognType</option>
+                                                    }
+                                                    <ValidationMessage For="(() => selectedVogn)"></ValidationMessage>
+                                                </select>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-check" id="tilaeg">
+                                        <label>Ekstra tillæg:</label>
+
+                                        @foreach (var option in extraOptions)
+                                        {
+                                            <div>
+                                                <input class="form-check-input" type="checkbox" id="@option.Id" value="@option.Pris" @bind="option.IsSelected" />
+                                                <label class="form-check-label">@option.Label</label>
+                                                <ValidationMessage For="(() => option.IsSelected)"></ValidationMessage>
+                                            </div>
+                                        }
+
+                                    </div>
+
+                                    <br />
+                                    <button type="submit" class="btn btn-primary btn-block" onclick="validateCaptcha()">Submit</button>
+
+                                </EditForm>
+                            </div>
+                            <div class="card-footer">
+                                <div class="row">
+                                    <div class="col">Din tur vil koste: @totalprice kr.</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <h2>Beregn afstand</h2>
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label for="from">Fra:</label>
+                    <input type="text" class="form-control" placeholder="Startdestination" id="from" />
+                </div>
+                <div class="form-group">
+                    <label for="to">Til:</label>
+                    <input type="text" class="form-control" placeholder="Slutdestination" id="to" />
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary btn-block" onclick="calcRoute()">
+                        Beregn
+                    </button>
+                </div>
+            </div>
+            <div id="output"></div>
+
+            <div id="map" style="height: 500px;"></div>
+        </div>
+    </div>
+</div>
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await js.InvokeVoidAsync("initialize", null);
+        }
+    }
+}
