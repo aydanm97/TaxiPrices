@@ -51,22 +51,27 @@ namespace TaxiPrices.Pages
             }
         }
 
-        public void HandleValidSubmit()
-        {
-            var selectedVognModel = vognChoice.FirstOrDefault(v => v.Id == selectedVogn);
-            decimal kmPrice = (decimal)selectedVognModel.KmPris;
-            minutePrice = (decimal)selectedVognModel.MinutePris;
+       public void HandleValidSubmit()
+{
+    // Retrieve the selected 'VognModel' based on 'selectedVogn'
+    var selectedVognModel = vognChoice.FirstOrDefault(v => v.Id == selectedVogn);
 
+    // Extract price per kilometer and price per minute from the selected 'VognModel'
+    decimal kmPrice = (decimal)selectedVognModel.KmPris;
+    minutePrice = (decimal)selectedVognModel.MinutePris;
 
-            decimal selectedOptionsTotal = extraOptions
-           .Where(option => option.IsSelected)
-           .Sum(option => option.Pris);
+    // Calculate the total cost of selected extra options
+    decimal selectedOptionsTotal = extraOptions
+        .Where(option => option.IsSelected)
+        .Sum(option => option.Pris);
 
-            decimal pris = (model.km * kmPrice);
-            decimal minuteCost = model.minutes * minutePrice;
-            totalprice = (selectedVognModel.StartPris + pris + minuteCost + selectedOptionsTotal).ToString();
+    // Calculate the price based on kilometers and minute prices
+    decimal pris = (model.km * kmPrice);
+    decimal minuteCost = model.minutes * minutePrice;
 
-        }
+    // Calculate the total price, including start price, kilometer cost, minute cost, and selected options
+    totalprice = (selectedVognModel.StartPris + pris + minuteCost + selectedOptionsTotal).ToString();
+}
 
 
 
